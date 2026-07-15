@@ -2,584 +2,371 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+
+<!-- スマホの画面幅に合わせて表示する設定 -->
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
+
 <title>もぐらたたきゲーム</title>
 
 <style>
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
+    min-height: 100vh;
+    padding: 16px;
     font-family: "Yu Gothic UI", sans-serif;
     text-align: center;
     background: #a8df9f;
+
+    /* スマホで画面を動かしにくくする */
+    overscroll-behavior: none;
 }
 
 h1 {
-    margin-top: 25px;
-    font-size: 38px;
+    margin: 8px 0 12px;
+    font-size: clamp(26px, 7vw, 38px);
 }
 
 .info {
     display: flex;
     justify-content: center;
-    gap: 70px;
-    font-size: 24px;
+    gap: 30px;
+    margin-bottom: 10px;
+    font-size: clamp(18px, 5vw, 24px);
     font-weight: bold;
 }
 
 #message {
-    font-size: 20px;
-    margin: 20px;
+    min-height: 30px;
+    margin: 12px 0;
+    font-size: clamp(16px, 4.5vw, 20px);
 }
 
 .game {
-    width: 520px;
+    width: min(94vw, 520px);
     margin: auto;
-    padding: 25px;
+    padding: clamp(10px, 3vw, 22px);
     background: #65ad69;
 
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-
-    gap: 15px;
+    gap: clamp(8px, 2.5vw, 15px);
 
     border-radius: 20px;
 }
 
 .hole {
-
-    height: 130px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
 
     border: none;
-
     border-radius: 50%;
 
     background: #704323;
+    color: #2f1d10;
 
-    font-size: 70px;
+    font-size: clamp(42px, 14vw, 72px);
+    line-height: 1;
 
     cursor: pointer;
 
     box-shadow:
-    inset 0 12px 5px
-    rgba(0,0,0,0.35);
+        inset 0 10px 5px rgba(0, 0, 0, 0.35);
 
+    /* スマホ操作の反応を改善 */
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.hole:hover {
-
-    background: #805330;
-
+.hole:active {
+    transform: scale(0.96);
 }
 
-#mole {
-
+.hole.mole {
     background: #ffd45c;
+}
 
+.hole.hit {
+    background: #ff9999;
 }
 
 #start {
+    margin: 20px 0 8px;
+    padding: 14px 45px;
 
-    margin: 30px;
-
-    padding:
-    15px 60px;
-
-    font-size: 23px;
-
+    font-size: clamp(18px, 5vw, 23px);
     font-weight: bold;
 
     background: #ffc94f;
-
     border: none;
-
     border-radius: 12px;
 
     cursor: pointer;
 
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-#start:hover {
-
-    background: #ffb925;
-
+#start:active {
+    transform: scale(0.97);
 }
 
+#start:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
 </style>
-
 </head>
-
 
 <body>
 
-
-<h1>
-
-🐹 もぐらたたきゲーム
-
-</h1>
-
+<h1>🐹 もぐらたたきゲーム</h1>
 
 <div class="info">
+    <div>
+        得点：
+        <span id="score">0</span>
+        点
+    </div>
 
-<div>
-
-得点：
-
-<span id="score">
-
-0
-
-</span>
-
-点
-
+    <div>
+        残り時間：
+        <span id="time">30</span>
+        秒
+    </div>
 </div>
-
-
-<div>
-
-残り時間：
-
-<span id="time">
-
-30
-
-</span>
-
-秒
-
-</div>
-
-</div>
-
 
 <div id="message">
-
-「ゲーム開始」を押してください
-
+    「ゲーム開始」を押してください
 </div>
-
 
 <div class="game">
-
-
-<button
-class="hole"
-onclick="hit(0)">
-●
-</button>
-
-
-<button
-class="hole"
-onclick="hit(1)">
-●
-</button>
-
-
-<button
-class="hole"
-onclick="hit(2)">
-●
-</button>
-
-
-<button
-class="hole"
-onclick="hit(3)">
-●
-</button>
-
-
-<button
-class="hole"
-onclick="hit(4)">
-●
-</button>
-
-
-<button
-class="hole"
-onclick="hit(5)">
-●
-</button>
-
-
-<button
-class="hole"
-onclick="hit(6)">
-●
-</button>
-
-
-<button
-class="hole"
-onclick="hit(7)">
-●
-</button>
-
-
-<button
-class="hole"
-onclick="hit(8)">
-●
-</button>
-
-
+    <button class="hole" type="button" aria-label="穴1">●</button>
+    <button class="hole" type="button" aria-label="穴2">●</button>
+    <button class="hole" type="button" aria-label="穴3">●</button>
+    <button class="hole" type="button" aria-label="穴4">●</button>
+    <button class="hole" type="button" aria-label="穴5">●</button>
+    <button class="hole" type="button" aria-label="穴6">●</button>
+    <button class="hole" type="button" aria-label="穴7">●</button>
+    <button class="hole" type="button" aria-label="穴8">●</button>
+    <button class="hole" type="button" aria-label="穴9">●</button>
 </div>
 
-
-<button
-id="start"
-onclick="startGame()">
-
-ゲーム開始
-
+<button id="start" type="button">
+    ゲーム開始
 </button>
 
-
 <script>
+"use strict";
 
+const GAME_TIME = 30;
+
+/*
+  もぐらの移動間隔です。
+  以前の700ミリ秒より長い1000ミリ秒にしています。
+*/
+const MOLE_INTERVAL = 1000;
 
 let score = 0;
-
-let time = 30;
-
-let mole = -1;
-
+let timeLeft = GAME_TIME;
+let molePosition = -1;
 let playing = false;
 
-let moleTimer;
+let moleTimer = null;
+let gameTimer = null;
 
-let gameTimer;
-
-
-
-const holes =
-
-document.querySelectorAll(
-
-".hole"
-
-);
+const holes = document.querySelectorAll(".hole");
+const scoreElement = document.getElementById("score");
+const timeElement = document.getElementById("time");
+const messageElement = document.getElementById("message");
+const startButton = document.getElementById("start");
 
 
+/* 全ての穴を元の状態に戻す */
+function clearHoles() {
+    holes.forEach((hole) => {
+        hole.textContent = "●";
+        hole.classList.remove("mole");
+        hole.classList.remove("hit");
+    });
+}
 
+
+/* もぐらをランダムな穴に表示する */
 function showMole() {
+    if (!playing) {
+        return;
+    }
 
+    clearHoles();
 
-if (
+    let newPosition;
 
-playing == false
+    /*
+      同じ穴が連続しにくいようにしています。
+    */
+    do {
+        newPosition = Math.floor(Math.random() * holes.length);
+    } while (
+        holes.length > 1 &&
+        newPosition === molePosition
+    );
 
-)
+    molePosition = newPosition;
 
-return;
-
-
-
-holes.forEach(
-
-hole => {
-
-hole.innerHTML = "●";
-
-hole.removeAttribute(
-
-"id"
-
-);
-
-}
-
-);
-
-
-
-mole =
-
-Math.floor(
-
-Math.random()*9
-
-);
-
-
-
-holes[mole].
-
-innerHTML =
-
-"🐹";
-
-
-
-holes[mole].
-
-id =
-
-"mole";
-
-
-
+    holes[molePosition].textContent = "🐹";
+    holes[molePosition].classList.add("mole");
 }
 
 
+/* もぐらをたたいたときの処理 */
+function hitMole(position, event) {
+    /*
+      スマホでの不要な画面操作を抑えます。
+    */
+    if (event) {
+        event.preventDefault();
+    }
 
-function hit(
+    if (!playing) {
+        return;
+    }
 
-number
+    if (position !== molePosition) {
+        return;
+    }
 
-) {
+    score += 10;
+    scoreElement.textContent = score;
 
+    holes[position].textContent = "💥";
+    holes[position].classList.remove("mole");
+    holes[position].classList.add("hit");
 
-if (
-
-playing == false
-
-)
-
-return;
-
-
-
-if (
-
-number == mole
-
-) {
-
-
-score =
-
-score + 10;
-
-
-
-document.
-
-getElementById(
-
-"score"
-
-).
-
-innerHTML =
-
-score;
-
-
-
-holes[number].
-
-innerHTML =
-
-"💥";
-
-
-
-mole = -1;
-
-
-}
-
+    /*
+      同じもぐらを何度も押して得点できないようにします。
+    */
+    molePosition = -1;
 }
 
 
+/* ゲームを終了する */
+function endGame() {
+    playing = false;
 
+    clearInterval(moleTimer);
+    clearInterval(gameTimer);
+
+    moleTimer = null;
+    gameTimer = null;
+
+    molePosition = -1;
+
+    clearHoles();
+
+    timeElement.textContent = "0";
+
+    messageElement.textContent =
+        "ゲーム終了！ 最終得点は " +
+        score +
+        " 点です";
+
+    startButton.disabled = false;
+    startButton.textContent = "もう一度遊ぶ";
+}
+
+
+/* ゲームを開始する */
 function startGame() {
-
-
-score = 0;
-
-time = 30;
-
-playing = true;
-
-
-
-document.
-
-getElementById(
-
-"score"
-
-).
-
-innerHTML =
-
-0;
-
-
-
-document.
-
-getElementById(
-
-"time"
-
-).
-
-innerHTML =
-
-30;
-
-
-
-document.
-
-getElementById(
-
-"message"
-
-).
-
-innerHTML =
-
-"もぐらをクリックしてください！";
-
-
-
-document.
-
-getElementById(
-
-"start"
-
-).
-
-disabled = true;
-
-
-
-showMole();
-
-
-
-moleTimer =
-
-setInterval(
-
-showMole,
-
-700
-
-);
-
-
-
-gameTimer =
-
-setInterval(
-
-function(){
-
-
-time--;
-
-
-
-document.
-
-getElementById(
-
-"time"
-
-).
-
-innerHTML =
-
-time;
-
-
-
-if (
-
-time <= 0
-
-) {
-
-
-clearInterval(
-
-moleTimer
-
-);
-
-
-
-clearInterval(
-
-gameTimer
-
-);
-
-
-
-playing = false;
-
-
-
-document.
-
-getElementById(
-
-"message"
-
-).
-
-innerHTML =
-
-"ゲーム終了！ 最終得点は "
-
-+ score +
-
-" 点です";
-
-
-
-document.
-
-getElementById(
-
-"start"
-
-).
-
-disabled =
-
-false;
-
-
-
-holes.forEach(
-
-hole => {
-
-hole.innerHTML =
-
-"●";
-
+    /*
+      前のタイマーが残っていた場合に止めます。
+    */
+    clearInterval(moleTimer);
+    clearInterval(gameTimer);
+
+    score = 0;
+    timeLeft = GAME_TIME;
+    molePosition = -1;
+    playing = true;
+
+    scoreElement.textContent = "0";
+    timeElement.textContent = String(GAME_TIME);
+
+    messageElement.textContent =
+        "光ったもぐらを押してください！";
+
+    startButton.disabled = true;
+    startButton.textContent = "ゲーム中";
+
+    clearHoles();
+    showMole();
+
+    /*
+      1秒ごとにもぐらを移動します。
+    */
+    moleTimer = setInterval(
+        showMole,
+        MOLE_INTERVAL
+    );
+
+    /*
+      1秒ごとに残り時間を減らします。
+    */
+    gameTimer = setInterval(() => {
+        timeLeft -= 1;
+        timeElement.textContent = String(timeLeft);
+
+        if (timeLeft <= 0) {
+            endGame();
+        }
+    }, 1000);
+}
+
+
+/*
+  pointerdownを使うことで、
+  スマホでは指を離したときではなく、
+  指を触れた時点で反応します。
+*/
+holes.forEach((hole, position) => {
+    hole.addEventListener(
+        "pointerdown",
+        (event) => {
+            hitMole(position, event);
+        }
+    );
+
+    /*
+      長押しメニューを表示しないようにします。
+    */
+    hole.addEventListener(
+        "contextmenu",
+        (event) => {
+            event.preventDefault();
+        }
+    );
 });
 
 
+startButton.addEventListener(
+    "pointerdown",
+    (event) => {
+        event.preventDefault();
 
-}
-
-
-},
-
-1000
-
+        if (!playing) {
+            startGame();
+        }
+    }
 );
-
-
-}
-
-
 </script>
 
-
 </body>
-
 </html>
